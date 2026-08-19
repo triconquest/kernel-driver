@@ -1,0 +1,27 @@
+﻿  Building 'kernelmode' with toolset 'WindowsKernelModeDriver10.0' and the 'Universal' target platform.
+  Stamping x64\Debug\kernelmode.inf
+  Stamping [Version] section with DriverVer=08/19/2026,18.49.44.963
+  main.cpp
+  kernelmode.vcxproj -> C:\Users\user\source\repos\2day\build\kernelmode.sys
+  Done Adding Additional Store
+  Successfully signed: C:\Users\user\source\repos\2day\build\kernelmode.sys
+  
+  Driver is 'Universal'.
+  ........................
+  Signability test complete.
+  
+  Errors:
+  None
+  
+  Warnings:
+  None
+  
+  Catalog generation complete.
+  C:\Users\user\source\repos\2day\build\kernelmode\kernelmode.cat
+  Set catalog attribute.
+  WdkVersion: 10.0.28000.0
+  Set catalog attribute.
+  WdkAssemblyVersion: 10.0.28000.2526
+  Done Adding Additional Store
+  Successfully signed: C:\Users\user\source\repos\2day\build\kernelmode\kernelmode.cat
+  

@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="kernelmode/kernelmode.vcxproj">
+    <Platform Project="x64" />
+    <Deploy />
+  </Project>
+  <Project Path="usermode/usermode.vcxproj" Id="672ad479-d19b-4519-9426-60d20ed8637e" />
+</Solution>
