@@ -12,7 +12,7 @@ NTSTATUS driver_main(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath) 
 	UNREFERENCED_PARAMETER(registryPath);
 
 	UNICODE_STRING deviceName = {};
-	RtlInitUnicodeString(&deviceName, L"\\Driver\\2daydrv");
+	RtlInitUnicodeString(&deviceName, L"\\Device\\2daydrv");
 
 	PDEVICE_OBJECT deviceObject = nullptr;
 	NTSTATUS status = IoCreateDevice(driverObject, 0, &deviceName, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &deviceObject);
