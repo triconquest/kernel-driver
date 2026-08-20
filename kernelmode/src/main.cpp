@@ -1,4 +1,4 @@
-#include <ntifs.h>
+#include "Hook/Hook.h"
 
 void DebugPrint(PCSTR text) {
 #ifndef DEBUG
@@ -8,7 +8,12 @@ void DebugPrint(PCSTR text) {
 	KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, text));
 }
 
-NTSTATUS DriverEntry() {
+extern "C" NTSTATUS DriverEntry(PDRIVER_OBJECT driverObject, PUNICODE_STRING regPath) {
+
+	UNREFERENCED_PARAMETER(driverObject);
+	UNREFERENCED_PARAMETER(regPath);
+
+	Hook::CallKernelFunction(&Hook::HookHandler);
 
 	return STATUS_SUCCESS;
 }
