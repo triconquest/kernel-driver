@@ -1,51 +1,9 @@
 ﻿  Building 'kernelmode' with toolset 'WindowsKernelModeDriver10.0' and the 'Universal' target platform.
   Stamping x64\Debug\kernelmode.inf
-  Stamping [Version] section with DriverVer=08/20/2026,1.38.3.171
-  Hook.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.28000.0\km\ntifs.h(85,52): error C2371: 'PEPROCESS': redefinition; different basic types
-  (compiling source file 'src/Hook/Hook.cpp')
-      C:\Program Files (x86)\Windows Kits\10\Include\10.0.28000.0\km\wdm.h(85,27):
-      see declaration of 'PEPROCESS'
-  
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.28000.0\km\ntifs.h(86,49): error C2371: 'PETHREAD': redefinition; different basic types
-  (compiling source file 'src/Hook/Hook.cpp')
-      C:\Program Files (x86)\Windows Kits\10\Include\10.0.28000.0\km\wdm.h(86,26):
-      see declaration of 'PETHREAD'
-  
-C:\Users\user\source\repos\2day\kernelmode\src\Hook\Hook.cpp(8,75): warning C4129: ' ': unrecognized character escape sequence
-C:\Users\user\source\repos\2day\kernelmode\src\Hook\Hook.cpp(8,129): error C2065: 'A': undeclared identifier
-C:\Users\user\source\repos\2day\kernelmode\src\Hook\Hook.cpp(8,127): warning C4130: '<': logical operation on address of string constant
-C:\Users\user\source\repos\2day\kernelmode\src\Hook\Hook.cpp(8,131): error C2146: syntax error: missing ')' before identifier 'KERNEL'
-C:\Users\user\source\repos\2day\kernelmode\src\Hook\Hook.cpp(8,53): error C2660: 'Memory::GetSystemModuleExport': function does not take 1 arguments
-      C:\Users\user\source\repos\2day\kernelmode\src\Utils\Memory.h(6,8):
-      see declaration of 'Memory::GetSystemModuleExport'
-      C:\Users\user\source\repos\2day\kernelmode\src\Hook\Hook.cpp(8,53):
-      while trying to match the argument list '()'
-  
-C:\Users\user\source\repos\2day\kernelmode\src\Hook\Hook.cpp(8,131): error C2146: syntax error: missing '(' before identifier 'KERNEL'
+  Stamping [Version] section with DriverVer=08/20/2026,21.15.25.929
   main.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.28000.0\km\ntifs.h(85,52): error C2371: 'PEPROCESS': redefinition; different basic types
-  (compiling source file 'src/main.cpp')
-      C:\Program Files (x86)\Windows Kits\10\Include\10.0.28000.0\km\wdm.h(85,27):
-      see declaration of 'PEPROCESS'
+  kernelmode.vcxproj -> C:\Users\user\source\repos\2day\build\kernelmode.sys
+  Done Adding Additional Store
+  Successfully signed: C:\Users\user\source\repos\2day\build\kernelmode.sys
   
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.28000.0\km\ntifs.h(86,49): error C2371: 'PETHREAD': redefinition; different basic types
-  (compiling source file 'src/main.cpp')
-      C:\Program Files (x86)\Windows Kits\10\Include\10.0.28000.0\km\wdm.h(86,26):
-      see declaration of 'PETHREAD'
-  
-  Memory.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.28000.0\km\ntifs.h(85,52): error C2371: 'PEPROCESS': redefinition; different basic types
-  (compiling source file 'src/Utils/Memory.cpp')
-      C:\Program Files (x86)\Windows Kits\10\Include\10.0.28000.0\km\wdm.h(85,27):
-      see declaration of 'PEPROCESS'
-  
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.28000.0\km\ntifs.h(86,49): error C2371: 'PETHREAD': redefinition; different basic types
-  (compiling source file 'src/Utils/Memory.cpp')
-      C:\Program Files (x86)\Windows Kits\10\Include\10.0.28000.0\km\wdm.h(86,26):
-      see declaration of 'PETHREAD'
-  
-C:\Users\user\source\repos\2day\kernelmode\src\Utils\Memory.cpp(34,17): error C7664: '<=': ordered comparison of pointer and integer zero ('PVOID' and 'int')
-C:\Users\user\source\repos\2day\kernelmode\src\Utils\Memory.cpp(11,55): warning C4996: 'ExAllocatePoolWithTag': ExAllocatePoolWithTag is deprecated, use ExAllocatePool2.
-C:\Users\user\source\repos\2day\kernelmode\src\Utils\Memory.cpp(57,36): warning C4267: 'argument': conversion from 'size_t' to 'ULONG', possible loss of data
-  Generating Code...
+  Driver is 'Universal'.

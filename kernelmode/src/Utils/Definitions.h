@@ -1,11 +1,11 @@
 #pragma once
-#include <ntdef.h>
-#include <ntddk.h>
+//#include <ntdef.h>
+//#include <ntddk.h>
+//#include <windef.h>
+//#include <ntstrsafe.h>
+//#include <wdm.h>
+//#pragma comment(lib, "ntoskrnl.lib")
 #include <ntifs.h>
-#include <windef.h>
-#include <ntstrsafe.h>
-#include <wdm.h>
-#pragma comment(lib, "ntoskrnl.lib")
 
 typedef enum _SYSTEM_INFORMATION_CLASS {
     SystemBasicInformation,
@@ -59,13 +59,91 @@ extern "C" NTSTATUS ZwQuerySystemInformation(ULONG InfoClass, PVOID Buffer, ULON
 extern "C" NTKERNELAPI
 PPEB PsGetProcessPeb(IN PEPROCESS Process);
 
-extern "C" NTSTATUS NTAPI MmCopyVirtualMemory
-(
-    PEPROCESS SourceProcess,
-    PVOID SourceAddress,
-    PEPROCESS TargetProcess,
-    PVOID TargetAddress,
-    SIZE_T BufferSize,
-    KPROCESSOR_MODE PreviousMode,
-    PSIZE_T ReturnSize
-);
+extern "C" {
+    NTKERNELAPI NTSTATUS IoCreateDriver(PUNICODE_STRING DriverName, PDRIVER_INITIALIZE InitializationFunction);
+    
+    NTKERNELAPI NTSTATUS MmCopyVirtualMemory(PEPROCESS SourceProcess, PVOID SourceAddress, PEPROCESS TargetProcess, PVOID TargetAddress, SIZE_T BufferSize, KPROCESSOR_MODE PreviousMode, PSIZE_T ReturnSize);
+}
+
+namespace Driver {
+    namespace Codes {
+        constexpr ULONG Attach = CTL_CODE(FILE_DEVICE_UNKNOWN, 0x800, METHOD_BUFFERED, FILE_SPECIAL_ACCESS);
+
+        constexpr ULONG Read = CTL_CODE(FILE_DEVICE_UNKNOWN, 0x801, METHOD_BUFFERED, FILE_SPECIAL_ACCESS);
+
+        constexpr ULONG Write = CTL_CODE(FILE_DEVICE_UNKNOWN, 0x802, METHOD_BUFFERED, FILE_SPECIAL_ACCESS);
+    }
+
+    struct Request {
+        HANDLE processId;
+
+        PVOID target;
+        PVOID buffer;
+
+        SIZE_T size;
+        SIZE_T returnSize;
+    };
+
+    NTSTATUS Create(PDEVICE_OBJECT deviceObject, PIRP irp) {
+        UNREFERENCED_PARAMETER(deviceObject);
+
+        IoCompleteRequest(irp, IO_NO_INCREMENT);
+
+        return irp->IoStatus.Status;
+    }
+
+    NTSTATUS Close(PDEVICE_OBJECT deviceObject, PIRP irp) {
+        UNREFERENCED_PARAMETER(deviceObject);
+
+        IoCompleteRequest(irp, IO_NO_INCREMENT);
+
+        return irp->IoStatus.Status;
+    }
+
+    NTSTATUS DeviceControl(PDEVICE_OBJECT deviceObject, PIRP irp) {
+        UNREFERENCED_PARAMETER(deviceObject);
+
+        //DebugPrint("[+] Device control called\n");
+
+        NTSTATUS status = STATUS_UNSUCCESSFUL;
+
+        PIO_STACK_LOCATION stackIRP = IoGetCurrentIrpStackLocation(irp);
+
+        auto request = reinterpret_cast<Request*>(irp->AssociatedIrp.SystemBuffer);
+
+        if (stackIRP == nullptr || request == nullptr) {
+            IoCompleteRequest(irp, IO_NO_INCREMENT);
+            return status;
+        }
+
+        static PEPROCESS targetProcess = nullptr;
+
+        const ULONG controlCode = stackIRP->Parameters.DeviceIoControl.IoControlCode;
+
+        switch (controlCode) {
+        case Codes::Attach:
+            status = PsLookupProcessByProcessId(request->processId, &targetProcess);
+            break;
+
+        case Codes::Read:
+            if (targetProcess != nullptr)
+                status = MmCopyVirtualMemory(targetProcess, request->target, PsGetCurrentProcess(), request->buffer, request->size, KernelMode, &request->returnSize);
+            break;
+
+        case Codes::Write:
+            if (targetProcess != nullptr)
+                status = MmCopyVirtualMemory(PsGetCurrentProcess(), request->buffer, targetProcess, request->target, request->size, KernelMode, &request->returnSize);
+            break;
+
+        default:
+            break;
+        }
+
+        irp->IoStatus.Status = status;
+        irp->IoStatus.Information = sizeof(Request);
+
+        IoCompleteRequest(irp, IO_NO_INCREMENT);
+
+        return status;
+    }
+}
