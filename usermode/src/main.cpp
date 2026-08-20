@@ -6,9 +6,8 @@
 // usermode
 
 int main() {
-	printf("usermode2\n");
 
-	const DWORD pID = Process.GetProcessID(L"Notepad.exe");
+	const DWORD pID = Process.GetProcessID(L"r5apex_dx12.exe");
 
 	if (pID == 0) {
 		std::cout << "Failed to find notepad\n";
@@ -28,26 +27,18 @@ int main() {
 		std::cout << "Attachment successful\n";
 	}
 
-	const uintptr_t moduleBase = Process.GetModuleBase(pID, L"Notepad.exe");
+	const uintptr_t moduleBase = Process.GetModuleBase(pID, L"r5apex_dx12.exe");
 
 	if (!moduleBase) {
-		printf("moduleBase is NULL\n");
+		printf("[!] moduleBase is NULL\n");
+		std::cin.get();
 		return 1;
+		
 	}
 
-	printf("[+] Notepad.exe moduleBase: 0x%llX\n", moduleBase);
+	printf("[+] moduleBase: 0x%llX\n", moduleBase);
 
-	printf("[+] Doing a random read...");
 
-	uintptr_t randomRead = Driver::Read<uintptr_t>(driver, moduleBase + 0x2F);
-
-	printf("[+] Random read result: %llX\n", randomRead);
-
-	printf("[+] Writing to a random address...\n");
-
-	Driver::Write<int>(driver, moduleBase + 0x0B, 100);
-
-	printf("[+] Wrote bs to some random address\n");
 
 
 	CloseHandle(driver);
