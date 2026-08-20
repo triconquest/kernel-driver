@@ -1,6 +1,6 @@
 ﻿  Building 'kernelmode' with toolset 'WindowsKernelModeDriver10.0' and the 'Universal' target platform.
   Stamping x64\Debug\kernelmode.inf
-  Stamping [Version] section with DriverVer=08/20/2026,21.15.25.929
+  Stamping [Version] section with DriverVer=08/20/2026,22.13.28.635
   main.cpp
   kernelmode.vcxproj -> C:\Users\user\source\repos\2day\build\kernelmode.sys
   Done Adding Additional Store

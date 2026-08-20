@@ -49,7 +49,7 @@ NTSTATUS driver_main(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath) 
 	return status;
 }
 
-extern "C" NTSTATUS DriverEntry() {
+NTSTATUS DriverEntry() {
 
 	DebugPrint("in the kernel\n");
 
