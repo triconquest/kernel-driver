@@ -43,7 +43,7 @@ namespace Driver {
     }
 
     template<typename T>
-    T Write(HANDLE driverHandle, const uintptr_t address, const T& value) {
+    void Write(HANDLE driverHandle, const uintptr_t address, const T& value) {
         Request request;
         request.target = reinterpret_cast<PVOID>(address);
         request.buffer = (PVOID)&value;

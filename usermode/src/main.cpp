@@ -28,6 +28,28 @@ int main() {
 		std::cout << "Attachment successful\n";
 	}
 
+	const uintptr_t moduleBase = Process.GetModuleBase(pID, L"Notepad.exe");
+
+	if (!moduleBase) {
+		printf("moduleBase is NULL\n");
+		return 1;
+	}
+
+	printf("[+] Notepad.exe moduleBase: 0x%llX\n", moduleBase);
+
+	printf("[+] Doing a random read...");
+
+	uintptr_t randomRead = Driver::Read<uintptr_t>(driver, moduleBase + 0x2F);
+
+	printf("[+] Random read result: %llX\n", randomRead);
+
+	printf("[+] Writing to a random address...\n");
+
+	Driver::Write<int>(driver, moduleBase + 0x0B, 100);
+
+	printf("[+] Wrote bs to some random address\n");
+
+
 	CloseHandle(driver);
 
 	std::cin.get();
