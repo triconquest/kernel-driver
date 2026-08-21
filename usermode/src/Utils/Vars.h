@@ -5,10 +5,10 @@ namespace Vars {
 	inline int currentTab = 0;
 
 	namespace Aimbot {
-		inline bool bEnabled = true;
+		inline bool bEnabled = false;
 	}
 
 	namespace ESP {
-		inline bool bEnabled = true;
+		inline bool bEnabled = false;
 	}
 }

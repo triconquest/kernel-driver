@@ -9,8 +9,8 @@
 
 int main() {
 
-	const wchar_t* processName = L"Notepad.exe";
-	const wchar_t* moduleName = L"Notepad.exe"; //L"r5apex_dx12.exe"  
+	const wchar_t* processName = L"r5apex_dx12.exe";
+	const wchar_t* moduleName = L"r5apex_dx12.exe"; //L""  
 
 	const DWORD pID = Process.GetProcessID(processName);
 
@@ -31,13 +31,13 @@ int main() {
 	}
 
 	if (!Driver::AttachToProcess(driver, pID)) {
-		std::cout << "Failed to attach to process\n";
+		printf("[!] Failed to attach to process\n");
 		CloseHandle(driver);
 		std::cin.get();
 		return 1;
 	}
 
-	std::cout << "Attachment successful\n";
+	printf("[+] Attachment successful\n");
 
 	ESP.SetDriverHandle(driver);
 

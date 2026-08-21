@@ -144,41 +144,31 @@ namespace Driver {
         case Codes::ResolveModules: {
             PEPROCESS process = NULL;
 
-            KdPrintEx((           DPFLTR_IHVDRIVER_ID,
+            KdPrintEx((
+                DPFLTR_IHVDRIVER_ID,
                 DPFLTR_INFO_LEVEL,
-                "PID: %p\n",
-                request->processId
+                "[ResolveModules] PID=%llu\n",
+                (ULONG_PTR)request->processId
                 ));
 
             NTSTATUS resolveStatus = PsLookupProcessByProcessId(request->processId, &process);
 
-            KdPrintEx((DPFLTR_IHVDRIVER_ID,
+            KdPrintEx((
+                DPFLTR_IHVDRIVER_ID,
                 DPFLTR_INFO_LEVEL,
-                "resolveStatus: 0x%08X\n",
+                "[ResolveModules] Lookup status: 0x%08X\n",
                 resolveStatus
                 ));
 
-            //fnPsGetProcessSectionBaseAddress PsGetProcessSectionBaseAddress = nullptr;
-
-            //UNICODE_STRING routineName;
-            //RtlInitUnicodeString(&routineName, L"PsGetProcessSectionBaseAddress");
-
-            //PsGetProcessSectionBaseAddress = (fnPsGetProcessSectionBaseAddress)MmGetSystemRoutineAddress(&routineName);
-
-            //KdPrintEx((DPFLTR_IHVDRIVER_ID,
-            //    DPFLTR_INFO_LEVEL,
-            //    "Function address: %p\n",
-            //    PsGetProcessSectionBaseAddress
-            //    ));
-
-            //if (!PsGetProcessSectionBaseAddress) {
-            //    ObDereferenceObject(process);
-            //    status = STATUS_NOT_SUPPORTED;
-            //    break;
-            //}
-
             if (NT_SUCCESS(resolveStatus)) {
                 PVOID imageBase = PsGetProcessSectionBaseAddress(process);
+
+                KdPrintEx((
+                    DPFLTR_IHVDRIVER_ID,
+                    DPFLTR_INFO_LEVEL,
+                    "[ResolveModules] Image base: %p\n",
+                    imageBase
+                    ));
 
                 request->buffer = imageBase;
                 status = request->buffer ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
@@ -186,7 +176,7 @@ namespace Driver {
                 ObDereferenceObject(process);
             }
             else {
-                status = resolveStatus; // TODO: modulebase doesn't function, we're getting 31, because DeviceIoControl fails, implement some debugprint so we can debug in the VM.
+                status = resolveStatus;
             }
 
             break;
