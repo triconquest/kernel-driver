@@ -49,6 +49,7 @@ uintptr_t CProcess::GetModuleBase(const DWORD pID, const wchar_t* moduleName)
 	if (Module32First(snapshot, &entry))
 	{
 		do {
+			printf("[Module] Found module %ls\n", entry.szModule);
 			if (!_wcsicmp(moduleName, entry.szModule))
 			{
 				CloseHandle(snapshot);

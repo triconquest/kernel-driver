@@ -88,6 +88,8 @@ namespace Driver {
 
         SIZE_T size;
         SIZE_T returnSize;
+
+        NTSTATUS status;
     };
 
     NTSTATUS Create(PDEVICE_OBJECT deviceObject, PIRP irp) {
@@ -118,6 +120,9 @@ namespace Driver {
         auto request = reinterpret_cast<Request*>(irp->AssociatedIrp.SystemBuffer);
 
         if (stackIRP == nullptr || request == nullptr) {
+            irp->IoStatus.Status = status;
+            irp->IoStatus.Information = sizeof(Request);
+
             IoCompleteRequest(irp, IO_NO_INCREMENT);
             return status;
         }
@@ -159,6 +164,8 @@ namespace Driver {
                 "[ResolveModules] Lookup status: 0x%08X\n",
                 resolveStatus
                 ));
+
+            request->status = resolveStatus;
 
             if (NT_SUCCESS(resolveStatus)) {
                 PVOID imageBase = PsGetProcessSectionBaseAddress(process);

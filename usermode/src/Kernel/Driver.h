@@ -22,6 +22,8 @@ namespace Driver {
 
         SIZE_T size;
         SIZE_T returnSize;
+
+        NTSTATUS status;
     };
 
     inline bool AttachToProcess(HANDLE driverHandle, const DWORD pID) {
@@ -43,6 +45,8 @@ namespace Driver {
             nullptr,
             nullptr
         );
+
+        printf("[Kernel ModuleBase] resolveStatus: 0x%08X\n", request.status);
 
         if (result) {
             out = reinterpret_cast<uintptr_t>(request.buffer);

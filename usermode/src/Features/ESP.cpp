@@ -17,13 +17,13 @@ std::vector<PlayerData> CESP::GetPlayers(uintptr_t moduleBase, int localTeam)
 
 	Vector3 localOrigin = Driver::Read<Vector3>(m_hDriver, localPlayerPtr + Offsets::m_vecAbsOrigin);
 
-	uintptr_t entListBase = Driver::Read<uintptr_t>(m_hDriver, moduleBase + Offsets::EntityList);
+	//uintptr_t entListBase = Driver::Read<uintptr_t>(m_hDriver, moduleBase + Offsets::EntityList);
 
-	if (!entListBase)
-		return players;
+	//if (!entListBase)
+	//	return players;
 
 	for (int i = 0; i < Offsets::MaxEntities; ++i) {
-		uintptr_t entPtr = Driver::Read<uintptr_t>(m_hDriver, entListBase + i * Offsets::EntityListEntrySize);
+		uintptr_t entPtr = Driver::Read<uintptr_t>(m_hDriver, moduleBase + Offsets::EntityList + (i * Offsets::EntityListEntrySize));
 
 		if (!entPtr || entPtr == localPlayerPtr)
 			continue;
@@ -38,6 +38,8 @@ std::vector<PlayerData> CESP::GetPlayers(uintptr_t moduleBase, int localTeam)
 		if (localTeam != -1 && team == localTeam)
 			continue;
 
+		
+
 		PlayerData pd = {};
 		pd.entityPtr = entPtr;
 		pd.team = team;
@@ -47,10 +49,16 @@ std::vector<PlayerData> CESP::GetPlayers(uintptr_t moduleBase, int localTeam)
 
 		pd.origin = Driver::Read<Vector3>(m_hDriver, entPtr + Offsets::m_vecAbsOrigin);
 
+		
+
 		Vector3 viewOffset = Driver::Read<Vector3>(m_hDriver, entPtr + Offsets::m_vecViewOffset);
 		pd.headPos = { pd.origin.x + viewOffset.x, pd.origin.y + viewOffset.y, pd.origin.z + viewOffset.z };
 
 		pd.health = Driver::Read<int>(m_hDriver, entPtr + Offsets::m_iHealth);
+
+		printf("[ESP] Entity #%d: health = %d lifeState = %d | team = %d | origin: [%.2f, %.2f, %.2f] | Knocked: %d | Zooming: %d\n", 
+			i, pd.health, lifeState, team, pd.origin.x, pd.origin.y, pd.origin.z, pd.isKnocked, pd.isZooming);
+
 		pd.maxHealth = Driver::Read<int>(m_hDriver, entPtr + Offsets::m_iMaxHealth);
 		pd.shield = Driver::Read<int>(m_hDriver, entPtr + Offsets::m_shieldHealth);
 		pd.maxShield = Driver::Read<int>(m_hDriver, entPtr + Offsets::m_shieldHealthMax);

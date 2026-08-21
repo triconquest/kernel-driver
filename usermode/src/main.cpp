@@ -9,8 +9,8 @@
 
 int main() {
 
-	const wchar_t* processName = L"Notepad.exe";
-	const wchar_t* moduleName = L"Notepad.exe"; //L"r5apex_dx12.exe"  
+	const wchar_t* processName = L"r5apex_dx12.exe";
+	const wchar_t* moduleName = L"r5apex_dx12.exe"; //L""  
 
 	const DWORD pID = Process.GetProcessID(processName);
 
@@ -20,7 +20,7 @@ int main() {
 		return 1;
 	}
 
-	printf("[+] Process found. PID: %lu\n", pID);
+	printf("[+] Process %ls found. PID: %lu\n", processName, pID);
 
 	const HANDLE driver = CreateFile(L"\\\\.\\2daydrv", GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
