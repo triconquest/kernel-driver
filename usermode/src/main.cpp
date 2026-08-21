@@ -9,8 +9,8 @@
 
 int main() {
 
-	const wchar_t* processName = L"r5apex_dx12.exe";
-	const wchar_t* moduleName = L"r5apex_dx12.exe";
+	const wchar_t* processName = L"Notepad.exe";
+	const wchar_t* moduleName = L"Notepad.exe"; //L"r5apex_dx12.exe"  
 
 	const DWORD pID = Process.GetProcessID(processName);
 
