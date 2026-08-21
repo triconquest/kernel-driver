@@ -1,5 +1,6 @@
 #include "Kernel/Driver.h"
 #include "Utils/Process.h"
+#include "Menu/Menu.h"
 
 #include <iostream>
 
@@ -7,13 +8,16 @@
 
 int main() {
 
-	const DWORD pID = Process.GetProcessID(L"r5apex_dx12.exe");
+	const wchar_t* moduleName = L"r5apex_dx12.exe";
+	const DWORD pID = Process.GetProcessID(L"Notepad.exe"); // L"r5apex_dx12.exe"
 
 	if (pID == 0) {
-		std::cout << "Failed to find notepad\n";
+		std::cout << "Failed to find process\n";
 		std::cin.get();
 		return 1;
 	}
+
+	printf("[+] Process found. PID: %lu\n", pID);
 
 	const HANDLE driver = CreateFile(L"\\\\.\\2daydrv", GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
@@ -27,7 +31,7 @@ int main() {
 		std::cout << "Attachment successful\n";
 	}
 
-	const uintptr_t moduleBase = Process.GetModuleBase(pID, L"r5apex_dx12.exe");
+	const uintptr_t moduleBase = Process.GetModuleBase(pID, L"Notepad.exe");
 
 	if (!moduleBase) {
 		printf("[!] moduleBase is NULL\n");
@@ -38,11 +42,34 @@ int main() {
 
 	printf("[+] moduleBase: 0x%llX\n", moduleBase);
 
+	// overlay init
+	OverlayWindow overlay;
+	if (!overlay.Initialize()) {
+		printf("[!] Menu failed to initialize\n");
+		return -1;
+	}
 
+	printf("[+] Menu initialized\n");
 
+	if (GetAsyncKeyState(VK_HOME)) {
 
+		if (GetAsyncKeyState(VK_INSERT) & 1)
+			Vars::bMenuOpen = !Vars::bMenuOpen;
+
+		overlay.BeginFrame();
+		overlay.RenderMenu();
+
+		ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+
+		// call here
+
+		
+		overlay.EndFrame();
+	}
+
+	printf("[+] Cleaning...\n");
 	CloseHandle(driver);
-
+	overlay.Cleanup();
 	std::cin.get();
 
 	return 0;

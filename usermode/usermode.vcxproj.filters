@@ -89,5 +89,11 @@
     <ClInclude Include="src\Menu\Overlay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Menu\Menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\Vars.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
