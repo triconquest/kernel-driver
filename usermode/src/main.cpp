@@ -51,7 +51,7 @@ int main() {
 
 	printf("[+] Menu initialized\n");
 
-	if (GetAsyncKeyState(VK_HOME)) {
+	while (!GetAsyncKeyState(VK_HOME)) {
 
 		if (GetAsyncKeyState(VK_INSERT) & 1)
 			Vars::bMenuOpen = !Vars::bMenuOpen;
