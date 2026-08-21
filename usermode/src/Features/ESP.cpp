@@ -24,7 +24,7 @@
 //		return players;
 //
 //	for (int i = 0; i < 60; ++i) {
-//		uintptr_t entPtr = Driver::Read<uintptr_t>(m_hDriver, entListBase + i);// i dont have offset for entitySize?
+//		uintptr_t entPtr = Driver::Read<uintptr_t>(m_hDriver, entListBase + i * Offsets::entitySize);// i dont have offset for entitySize?
 //
 //		if (!entPtr || entPtr == localPlayerPtr)
 //			continue;
