@@ -1,2 +1,6 @@
-﻿  main.cpp
-  usermode.vcxproj -> C:\Users\user\source\repos\2day\build\usermode.exe
+﻿  ESP.cpp
+  main.cpp
+C:\Users\user\source\repos\2day\usermode\src\Kernel\Driver.h(50,13): error C3861: 'printf': identifier not found
+  (compiling source file 'src/main.cpp')
+  
+  Generating Code...

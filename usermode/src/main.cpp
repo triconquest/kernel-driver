@@ -43,7 +43,7 @@ int main() {
 
 	uintptr_t moduleBase = 0;
 	if (!Driver::GetModuleBase(driver, pID, moduleBase)) {
-		printf("[!] Coulnd't get modulebase\n");
+		printf("[!] Coulnd't get module base\n");
 		CloseHandle(driver);
 		std::cin.get();
 		return 1;

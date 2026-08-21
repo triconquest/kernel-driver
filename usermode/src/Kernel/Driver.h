@@ -46,6 +46,9 @@ namespace Driver {
         if (result) {
             out = reinterpret_cast<uintptr_t>(request.buffer);
         }
+        else {
+            printf("DeviceIoControl failed: %lu\n", GetLastError());
+        }
 
         return result;
     }
