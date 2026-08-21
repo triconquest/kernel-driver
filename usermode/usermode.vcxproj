@@ -164,7 +164,6 @@
     <ClInclude Include="src\Menu\ImGui\imstb_textedit.h" />
     <ClInclude Include="src\Menu\ImGui\imstb_truetype.h" />
     <ClInclude Include="src\Menu\Menu.h" />
-    <ClInclude Include="src\Menu\Overlay.h" />
     <ClInclude Include="src\Utils\Math.h" />
     <ClInclude Include="src\Utils\Offsets.h" />
     <ClInclude Include="src\Utils\Process.h" />

@@ -14,7 +14,7 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-LRESULT CALLBACK OverlayWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+inline LRESULT CALLBACK OverlayWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 		return true;
 
@@ -36,7 +36,10 @@ private:
 	IDXGISwapChain* swapChain;
 	ID3D11RenderTargetView* renderTarget;
 
-	void SetupD3D11(HWND hwnd) {
+	bool clickThrough;
+	bool shouldClose;
+
+	bool SetupD3D11(HWND hwnd) {
 		DXGI_SWAP_CHAIN_DESC sd;
 		ZeroMemory(&sd, sizeof(sd));
 		sd.BufferCount = 2;
@@ -58,19 +61,24 @@ private:
 		);
 
 		if (hr == DXGI_ERROR_UNSUPPORTED) {
-			D3D11CreateDeviceAndSwapChain(
+			hr = D3D11CreateDeviceAndSwapChain(
 				nullptr, D3D_DRIVER_TYPE_WARP, nullptr, 0,
 				levels, 2, D3D11_SDK_VERSION, &sd,
 				&swapChain, &d3dDevice, &obtainedLevel, &d3dContext
 			);
 		}
 
+		if (FAILED(hr))
+			return false;
+
 		ID3D11Texture2D* backBuffer = nullptr;
-		swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
-		if (backBuffer) {
-			d3dDevice->CreateRenderTargetView(backBuffer, nullptr, &renderTarget);
-			backBuffer->Release();
-		}
+		if (FAILED(swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))) || backBuffer == nullptr)
+			return false;
+
+		hr = d3dDevice->CreateRenderTargetView(backBuffer, nullptr, &renderTarget);
+		backBuffer->Release();
+
+		return SUCCEEDED(hr);
 	}
 
 	void CleanupD3D11() {
@@ -150,7 +158,7 @@ private:
 
 public:
 	OverlayWindow() : windowHandle(nullptr), d3dDevice(nullptr), d3dContext(nullptr),
-		swapChain(nullptr), renderTarget(nullptr) {
+		swapChain(nullptr), renderTarget(nullptr), clickThrough(true), shouldClose(false) {
 		ZeroMemory(&windowClass, sizeof(windowClass));
 	}
 
@@ -193,7 +201,10 @@ public:
 		ShowWindow(windowHandle, SW_SHOW);
 		UpdateWindow(windowHandle);
 
-		SetupD3D11(windowHandle);
+		if (!SetupD3D11(windowHandle)) {
+			CleanupD3D11();
+			return false;
+		}
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -211,15 +222,23 @@ public:
 	void BeginFrame() {
 		MSG msg;
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+			if (msg.message == WM_QUIT)
+				shouldClose = true;
+
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
 
-		if (Vars::bMenuOpen) {
-			SetWindowLong(windowHandle, GWL_EXSTYLE, WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TOOLWINDOW);
-		}
-		else {
-			SetWindowLong(windowHandle, GWL_EXSTYLE, WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW);
+		const bool wantClickThrough = !Vars::bMenuOpen;
+
+		if (wantClickThrough != clickThrough) {
+			LONG exStyle = WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TOOLWINDOW;
+
+			if (wantClickThrough)
+				exStyle |= WS_EX_TRANSPARENT;
+
+			SetWindowLong(windowHandle, GWL_EXSTYLE, exStyle);
+			clickThrough = wantClickThrough;
 		}
 
 		ImGui_ImplDX11_NewFrame();
@@ -272,9 +291,6 @@ public:
 		ImGui::EndChild();
 
 		ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(0.165f, 0.188f, 0.271f, 1.0f));
-		ImGui::PopStyleColor();
-		ImGui::SameLine();
 
 		ImGui::BeginChild("Content", ImVec2(0, 0), false);
 
@@ -296,7 +312,7 @@ public:
 		d3dContext->ClearRenderTargetView(renderTarget, clearColor);
 
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-		swapChain->Present(0, 0);
+		swapChain->Present(1, 0);
 	}
 
 	void Cleanup() {
@@ -315,4 +331,6 @@ public:
 	}
 
 	HWND GetWindowHandle() const { return windowHandle; }
+
+	bool ShouldClose() const { return shouldClose; }
 };

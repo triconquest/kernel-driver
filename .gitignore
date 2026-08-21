@@ -1,1 +1,11 @@
 .vs/
+
+x64/
+out/
+
+*.obj
+*.ilk
+*.idb
+*.tlog
+*.lastbuildstate
+*.recipe

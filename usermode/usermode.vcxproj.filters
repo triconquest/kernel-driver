@@ -86,9 +86,6 @@
     <ClInclude Include="src\Menu\ImGui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Menu\Overlay.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Menu\Menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>

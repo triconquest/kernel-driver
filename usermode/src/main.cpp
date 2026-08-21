@@ -1,5 +1,6 @@
 #include "Kernel/Driver.h"
 #include "Utils/Process.h"
+#include "Features/ESP.h"
 #include "Menu/Menu.h"
 
 #include <iostream>
@@ -8,8 +9,10 @@
 
 int main() {
 
+	const wchar_t* processName = L"r5apex_dx12.exe";
 	const wchar_t* moduleName = L"r5apex_dx12.exe";
-	const DWORD pID = Process.GetProcessID(L"Notepad.exe"); // L"r5apex_dx12.exe"
+
+	const DWORD pID = Process.GetProcessID(processName);
 
 	if (pID == 0) {
 		std::cout << "Failed to find process\n";
@@ -27,17 +30,30 @@ int main() {
 		return 1;
 	}
 
-	if (Driver::AttachToProcess(driver, pID) == true) {
-		std::cout << "Attachment successful\n";
+	if (!Driver::AttachToProcess(driver, pID)) {
+		std::cout << "Failed to attach to process\n";
+		CloseHandle(driver);
+		std::cin.get();
+		return 1;
 	}
 
-	const uintptr_t moduleBase = Process.GetModuleBase(pID, L"Notepad.exe");
+	std::cout << "Attachment successful\n";
+
+	ESP.SetDriverHandle(driver);
+
+	uintptr_t moduleBase = 0;
+	if (!Driver::GetModuleBase(driver, pID, moduleBase)) {
+		printf("[!] Coulnd't get modulebase\n");
+		CloseHandle(driver);
+		std::cin.get();
+		return 1;
+	}
 
 	if (!moduleBase) {
 		printf("[!] moduleBase is NULL\n");
+		CloseHandle(driver);
 		std::cin.get();
 		return 1;
-		
 	}
 
 	printf("[+] moduleBase: 0x%llX\n", moduleBase);
@@ -46,12 +62,14 @@ int main() {
 	OverlayWindow overlay;
 	if (!overlay.Initialize()) {
 		printf("[!] Menu failed to initialize\n");
+		CloseHandle(driver);
+		std::cin.get();
 		return -1;
 	}
 
 	printf("[+] Menu initialized\n");
 
-	while (!GetAsyncKeyState(VK_HOME)) {
+	while (!overlay.ShouldClose() && !(GetAsyncKeyState(VK_HOME) & 0x8000)) {
 
 		if (GetAsyncKeyState(VK_INSERT) & 1)
 			Vars::bMenuOpen = !Vars::bMenuOpen;
@@ -59,11 +77,9 @@ int main() {
 		overlay.BeginFrame();
 		overlay.RenderMenu();
 
-		ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+		if (Vars::ESP::bEnabled)
+			ESP.Run(moduleBase);
 
-		// call here
-
-		
 		overlay.EndFrame();
 	}
 

@@ -9,6 +9,8 @@ namespace Driver {
         constexpr ULONG Read = CTL_CODE(FILE_DEVICE_UNKNOWN, 0x801, METHOD_BUFFERED, FILE_SPECIAL_ACCESS);
 
         constexpr ULONG Write = CTL_CODE(FILE_DEVICE_UNKNOWN, 0x802, METHOD_BUFFERED, FILE_SPECIAL_ACCESS);
+
+        constexpr ULONG ResolveModules = CTL_CODE(FILE_DEVICE_UNKNOWN, 0x803, METHOD_BUFFERED, FILE_SPECIAL_ACCESS);
     }
 
     struct Request {
@@ -21,34 +23,72 @@ namespace Driver {
         SIZE_T returnSize;
     };
 
-    bool AttachToProcess(HANDLE driverHandle, const DWORD pID) {
-        Request request;
-        request.processId = reinterpret_cast<HANDLE>(pID);
+    inline bool AttachToProcess(HANDLE driverHandle, const DWORD pID) {
+        Request request = {};
+        request.processId = reinterpret_cast<HANDLE>(static_cast<ULONG_PTR>(pID));
 
-        return DeviceIoControl(driverHandle, Codes::Attach, &request, sizeof(request), &request, sizeof(request), nullptr, nullptr);
+        return DeviceIoControl(driverHandle, Codes::Attach, &request, sizeof(request), &request, sizeof(request), nullptr, nullptr) != FALSE;
+    }
+
+    inline bool GetModuleBase(HANDLE driverHandle, const DWORD pID, uintptr_t& out) {
+        Request request = {};
+        request.processId = reinterpret_cast<HANDLE>(static_cast<ULONG_PTR>(pID));
+
+        BOOL result = DeviceIoControl(
+            driverHandle,
+            Codes::ResolveModules,
+            &request, sizeof(request),   // input buffer
+            &request, sizeof(request),   // output buffer
+            nullptr,
+            nullptr
+        );
+
+        if (result) {
+            out = reinterpret_cast<uintptr_t>(request.buffer);
+        }
+
+        return result;
+    }
+
+    template<typename T>
+    bool TryRead(HANDLE driverHandle, const uintptr_t address, T& out) {
+        if (driverHandle == nullptr || driverHandle == INVALID_HANDLE_VALUE || address == 0)
+            return false;
+
+        Request request = {};
+        request.target = reinterpret_cast<PVOID>(address);
+        request.buffer = &out;
+        request.size = sizeof(T);
+
+        if (!DeviceIoControl(driverHandle, Codes::Read, &request, sizeof(request), &request, sizeof(request), nullptr, nullptr))
+            return false;
+
+        return request.returnSize == sizeof(T);
     }
 
     template<typename T>
     T Read(HANDLE driverHandle, const uintptr_t address) {
         T temp = {};
 
-        Request request;
-        request.target = reinterpret_cast<PVOID>(address);
-        request.buffer = &temp;
-        request.size = sizeof(T);
-
-        DeviceIoControl(driverHandle, Codes::Read, &request, sizeof(request), &request, sizeof(request), nullptr, nullptr);
+        if (!TryRead(driverHandle, address, temp))
+            return T{};
 
         return temp;
     }
 
     template<typename T>
-    void Write(HANDLE driverHandle, const uintptr_t address, const T& value) {
-        Request request;
+    bool Write(HANDLE driverHandle, const uintptr_t address, const T& value) {
+        if (driverHandle == nullptr || driverHandle == INVALID_HANDLE_VALUE || address == 0)
+            return false;
+
+        Request request = {};
         request.target = reinterpret_cast<PVOID>(address);
-        request.buffer = (PVOID)&value;
+        request.buffer = const_cast<PVOID>(reinterpret_cast<const void*>(&value));
         request.size = sizeof(T);
 
-        DeviceIoControl(driverHandle, Codes::Write, &request, sizeof(request), &request, sizeof(request), nullptr, nullptr);
+        if (!DeviceIoControl(driverHandle, Codes::Write, &request, sizeof(request), &request, sizeof(request), nullptr, nullptr))
+            return false;
+
+        return request.returnSize == sizeof(T);
     }
 }

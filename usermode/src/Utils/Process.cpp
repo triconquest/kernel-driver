@@ -10,13 +10,19 @@ DWORD CProcess::GetProcessID(const wchar_t* procName)
 
 	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
+	if (snapshot == INVALID_HANDLE_VALUE)
+	{
+		printf("[!] Failed to snapshot processes (%lu)\n", GetLastError());
+		return 0;
+	}
+
 	if (Process32First(snapshot, &entry))
 	{
 		do {
-			if (!wcscmp(procName, entry.szExeFile))
+			if (!_wcsicmp(procName, entry.szExeFile))
 			{
 				CloseHandle(snapshot);
-				this->processId = entry.th32ProcessID; 
+				this->processId = entry.th32ProcessID;
 				return entry.th32ProcessID;
 			}
 		} while (Process32Next(snapshot, &entry));
@@ -34,10 +40,16 @@ uintptr_t CProcess::GetModuleBase(const DWORD pID, const wchar_t* moduleName)
 
 	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pID);
 
+	if (snapshot == INVALID_HANDLE_VALUE)
+	{
+		printf("[!] Failed to snapshot modules (%lu)\n", GetLastError());
+		return 0;
+	}
+
 	if (Module32First(snapshot, &entry))
 	{
 		do {
-			if (wcsstr(moduleName, entry.szModule) != nullptr)
+			if (!_wcsicmp(moduleName, entry.szModule))
 			{
 				CloseHandle(snapshot);
 				this->moduleBase = (uintptr_t)entry.modBaseAddr;
@@ -50,5 +62,3 @@ uintptr_t CProcess::GetModuleBase(const DWORD pID, const wchar_t* moduleName)
 	CloseHandle(snapshot);
 	return 0;
 }
-
-

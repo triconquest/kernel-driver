@@ -27,14 +27,14 @@ struct PlayerData {
 class CESP {
 public:
 
-	inline void GetDriverHandle(HANDLE hDriver) { m_hDriver = hDriver; }
+	void SetDriverHandle(HANDLE hDriver) { m_hDriver = hDriver; }
 
-	inline void Run(uintptr_t moduleBase, int localTeam);
-	inline std::vector<PlayerData> GetPlayers(uintptr_t moduleBase, int localTeam);
+	void Run(uintptr_t moduleBase);
+	std::vector<PlayerData> GetPlayers(uintptr_t moduleBase, int localTeam);
 
 private:
 
-	HANDLE m_hDriver;
+	HANDLE m_hDriver = nullptr;
 };
 
 inline CESP ESP;

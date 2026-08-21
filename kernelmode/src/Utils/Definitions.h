@@ -63,7 +63,11 @@ extern "C" {
     NTKERNELAPI NTSTATUS IoCreateDriver(PUNICODE_STRING DriverName, PDRIVER_INITIALIZE InitializationFunction);
     
     NTKERNELAPI NTSTATUS MmCopyVirtualMemory(PEPROCESS SourceProcess, PVOID SourceAddress, PEPROCESS TargetProcess, PVOID TargetAddress, SIZE_T BufferSize, KPROCESSOR_MODE PreviousMode, PSIZE_T ReturnSize);
+
+    //NTKERNELAPI PVOID PsGetProcessSectionBaseAddress(PEPROCESS Process);
 }
+
+typedef PVOID(NTAPI* fnPsGetProcessSectionBaseAddress)(PEPROCESS Process);
 
 namespace Driver {
     namespace Codes {
@@ -72,6 +76,8 @@ namespace Driver {
         constexpr ULONG Read = CTL_CODE(FILE_DEVICE_UNKNOWN, 0x801, METHOD_BUFFERED, FILE_SPECIAL_ACCESS);
 
         constexpr ULONG Write = CTL_CODE(FILE_DEVICE_UNKNOWN, 0x802, METHOD_BUFFERED, FILE_SPECIAL_ACCESS);
+
+        constexpr ULONG ResolveModules = CTL_CODE(FILE_DEVICE_UNKNOWN, 0x803, METHOD_BUFFERED, FILE_SPECIAL_ACCESS);
     }
 
     struct Request {
@@ -134,6 +140,32 @@ namespace Driver {
             if (targetProcess != nullptr)
                 status = MmCopyVirtualMemory(PsGetCurrentProcess(), request->buffer, targetProcess, request->target, request->size, KernelMode, &request->returnSize);
             break;
+
+        case Codes::ResolveModules: {
+            PEPROCESS process = NULL;
+            NTSTATUS resolveStatus = PsLookupProcessByProcessId(request->processId, &process);
+
+            fnPsGetProcessSectionBaseAddress PsGetProcessSectionBaseAddress = nullptr;
+
+            UNICODE_STRING routineName;
+            RtlInitUnicodeString(&routineName, L"PsGetProcessSectionBaseAddress");
+
+            PsGetProcessSectionBaseAddress =
+                (fnPsGetProcessSectionBaseAddress)MmGetSystemRoutineAddress(&routineName);
+
+            if (!PsGetProcessSectionBaseAddress) {
+                return STATUS_NOT_SUPPORTED;
+                break;
+            }
+
+            if (NT_SUCCESS(resolveStatus)) {
+                PVOID imageBase = PsGetProcessSectionBaseAddress(process);
+                request->buffer = imageBase;
+                ObDereferenceObject(process);
+            }
+
+            break;
+        }
 
         default:
             break;
