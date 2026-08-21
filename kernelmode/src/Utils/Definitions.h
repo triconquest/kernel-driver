@@ -154,14 +154,21 @@ namespace Driver {
                 (fnPsGetProcessSectionBaseAddress)MmGetSystemRoutineAddress(&routineName);
 
             if (!PsGetProcessSectionBaseAddress) {
-                return STATUS_NOT_SUPPORTED;
+                ObDereferenceObject(process);
+                status = STATUS_NOT_SUPPORTED;
                 break;
             }
 
             if (NT_SUCCESS(resolveStatus)) {
                 PVOID imageBase = PsGetProcessSectionBaseAddress(process);
+
                 request->buffer = imageBase;
+                status = request->buffer ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
+
                 ObDereferenceObject(process);
+            }
+            else {
+                status = resolveStatus;
             }
 
             break;
