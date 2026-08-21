@@ -64,7 +64,7 @@ extern "C" {
     
     NTKERNELAPI NTSTATUS MmCopyVirtualMemory(PEPROCESS SourceProcess, PVOID SourceAddress, PEPROCESS TargetProcess, PVOID TargetAddress, SIZE_T BufferSize, KPROCESSOR_MODE PreviousMode, PSIZE_T ReturnSize);
 
-    //NTKERNELAPI PVOID PsGetProcessSectionBaseAddress(PEPROCESS Process);
+    NTKERNELAPI PVOID PsGetProcessSectionBaseAddress(PEPROCESS Process);
 }
 
 typedef PVOID(NTAPI* fnPsGetProcessSectionBaseAddress)(PEPROCESS Process);
@@ -143,21 +143,39 @@ namespace Driver {
 
         case Codes::ResolveModules: {
             PEPROCESS process = NULL;
+
+            KdPrintEx((           DPFLTR_IHVDRIVER_ID,
+                DPFLTR_INFO_LEVEL,
+                "PID: %p\n",
+                request->processId
+                ));
+
             NTSTATUS resolveStatus = PsLookupProcessByProcessId(request->processId, &process);
 
-            fnPsGetProcessSectionBaseAddress PsGetProcessSectionBaseAddress = nullptr;
+            KdPrintEx((DPFLTR_IHVDRIVER_ID,
+                DPFLTR_INFO_LEVEL,
+                "resolveStatus: 0x%08X\n",
+                resolveStatus
+                ));
 
-            UNICODE_STRING routineName;
-            RtlInitUnicodeString(&routineName, L"PsGetProcessSectionBaseAddress");
+            //fnPsGetProcessSectionBaseAddress PsGetProcessSectionBaseAddress = nullptr;
 
-            PsGetProcessSectionBaseAddress =
-                (fnPsGetProcessSectionBaseAddress)MmGetSystemRoutineAddress(&routineName);
+            //UNICODE_STRING routineName;
+            //RtlInitUnicodeString(&routineName, L"PsGetProcessSectionBaseAddress");
 
-            if (!PsGetProcessSectionBaseAddress) {
-                ObDereferenceObject(process);
-                status = STATUS_NOT_SUPPORTED;
-                break;
-            }
+            //PsGetProcessSectionBaseAddress = (fnPsGetProcessSectionBaseAddress)MmGetSystemRoutineAddress(&routineName);
+
+            //KdPrintEx((DPFLTR_IHVDRIVER_ID,
+            //    DPFLTR_INFO_LEVEL,
+            //    "Function address: %p\n",
+            //    PsGetProcessSectionBaseAddress
+            //    ));
+
+            //if (!PsGetProcessSectionBaseAddress) {
+            //    ObDereferenceObject(process);
+            //    status = STATUS_NOT_SUPPORTED;
+            //    break;
+            //}
 
             if (NT_SUCCESS(resolveStatus)) {
                 PVOID imageBase = PsGetProcessSectionBaseAddress(process);
@@ -168,7 +186,7 @@ namespace Driver {
                 ObDereferenceObject(process);
             }
             else {
-                status = resolveStatus;
+                status = resolveStatus; // TODO: modulebase doesn't function, we're getting 31, because DeviceIoControl fails, implement some debugprint so we can debug in the VM.
             }
 
             break;
