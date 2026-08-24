@@ -1,11 +1,8 @@
 ﻿  Building 'kernelmode' with toolset 'WindowsKernelModeDriver10.0' and the 'Universal' target platform.
   Stamping x64\Debug\kernelmode.inf
-  Stamping [Version] section with DriverVer=08/24/2026,15.18.19.36
-  Memory.cpp
-C:\Users\user\source\repos\2day\kernelmode\src\Utils\Memory.cpp(11,55): warning C4996: 'ExAllocatePoolWithTag': ExAllocatePoolWithTag is deprecated, use ExAllocatePool2.
-C:\Users\user\source\repos\2day\kernelmode\src\Utils\Memory.cpp(60,36): warning C4267: 'argument': conversion from 'size_t' to 'ULONG', possible loss of data
-  main.cpp
-  Generating Code...
+  Stamping [Version] section with DriverVer=08/24/2026,15.23.45.854
+  Hook.cpp
+C:\Users\user\source\repos\2day\kernelmode\src\Hook\Hook.cpp(33,34): warning C4100: 'calledParam': unreferenced parameter
   kernelmode.vcxproj -> C:\Users\user\source\repos\2day\build\kernelmode.sys
   Done Adding Additional Store
   Successfully signed: C:\Users\user\source\repos\2day\build\kernelmode.sys
