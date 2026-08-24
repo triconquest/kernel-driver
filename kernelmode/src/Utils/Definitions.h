@@ -1,10 +1,4 @@
 #pragma once
-//#include <ntdef.h>
-//#include <ntddk.h>
-//#include <windef.h>
-//#include <ntstrsafe.h>
-//#include <wdm.h>
-//#pragma comment(lib, "ntoskrnl.lib")
 #include <ntifs.h>
 
 typedef enum _SYSTEM_INFORMATION_CLASS {
@@ -92,7 +86,7 @@ namespace Driver {
         NTSTATUS status;
     };
 
-    NTSTATUS Create(PDEVICE_OBJECT deviceObject, PIRP irp) {
+    inline NTSTATUS Create(PDEVICE_OBJECT deviceObject, PIRP irp) {
         UNREFERENCED_PARAMETER(deviceObject);
 
         IoCompleteRequest(irp, IO_NO_INCREMENT);
@@ -100,7 +94,7 @@ namespace Driver {
         return irp->IoStatus.Status;
     }
 
-    NTSTATUS Close(PDEVICE_OBJECT deviceObject, PIRP irp) {
+    inline NTSTATUS Close(PDEVICE_OBJECT deviceObject, PIRP irp) {
         UNREFERENCED_PARAMETER(deviceObject);
 
         IoCompleteRequest(irp, IO_NO_INCREMENT);
@@ -108,7 +102,7 @@ namespace Driver {
         return irp->IoStatus.Status;
     }
 
-    NTSTATUS DeviceControl(PDEVICE_OBJECT deviceObject, PIRP irp) {
+    inline NTSTATUS DeviceControl(PDEVICE_OBJECT deviceObject, PIRP irp) {
         UNREFERENCED_PARAMETER(deviceObject);
 
         //DebugPrint("[+] Device control called\n");

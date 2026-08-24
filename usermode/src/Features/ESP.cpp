@@ -56,7 +56,7 @@ std::vector<PlayerData> CESP::GetPlayers(uintptr_t moduleBase, int localTeam)
 
 		pd.health = Driver::Read<int>(m_hDriver, entPtr + Offsets::m_iHealth);
 
-		printf("[ESP] Entity #%d: health = %d lifeState = %d | team = %d | origin: [%.2f, %.2f, %.2f] | Knocked: %d | Zooming: %d\n", 
+		printf("[ESP] Entity #%d: health = %d | lifeState = %d | team = %d | origin: [%.2f, %.2f, %.2f] | Knocked: %d | Zooming: %d\n", 
 			i, pd.health, lifeState, team, pd.origin.x, pd.origin.y, pd.origin.z, pd.isKnocked, pd.isZooming);
 
 		pd.maxHealth = Driver::Read<int>(m_hDriver, entPtr + Offsets::m_iMaxHealth);
