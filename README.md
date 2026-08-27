@@ -1,8 +1,8 @@
 # Kernel Driver
 
-this kernel driver communicates with an usermode app via ICOTL.
+this kernel driver communicates with an usermode app via IOCTL.
 
-## Prerequisites TODO: links
+## Prerequisites
 
 1. KDMapper (used to load our driver)
 2. Windows SDK/WDK
@@ -22,6 +22,5 @@ the operations include:
 * Reading memory
 * Writing memory
 
-currently this is detected in apex legends because this is the most primitive method EVER.
-
-What we should do in the future is use a KVM (linux), because EAC runs usermode on linux
+Next steps:
+Add kernel function hooks
