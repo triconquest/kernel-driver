@@ -4,9 +4,9 @@ this kernel driver communicates with an usermode app via IOCTL.
 
 ## Prerequisites
 
-1. KDMapper (used to load our driver)
-2. Windows SDK/WDK
-3. WinDbg
+1. [KDMapper](https://github.com/TheCruZ/kdmapper) (used to load our driver)
+2. [Windows SDK/WDK](https://learn.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk)
+3. [WinDbg](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/)
 4. a Windows 11 VM
 
 (make sure to disable `Enforce Unsigned Driver Blocklist` in `Device Integrity` section of Windows Security)
